@@ -1,0 +1,76 @@
+[
+    {
+        "key":  "name",
+        "templateOptions":  {
+                                "label":  "Name",
+                                "required":  true,
+                                "minLength":  2
+                            },
+        "type":  "input",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  false
+    },
+    {
+        "key":  "ResourceCapacity",
+        "templateOptions":  {
+                                "label":  "ResourceCapacity",
+                                "placeholder":  "10"
+                            },
+        "type":  "input",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  false
+    },
+    {
+        "key":  "Naming",
+        "templateOptions":  {
+                                "label":  "Room mailbox that will be created",
+                                "required":  false,
+                                "grid":  {
+                                             "columns":  [
+                                                             {
+                                                                 "headerName":  "Alias",
+                                                                 "field":  "alias"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Display Name",
+                                                                 "field":  "displayName"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Primary Smtp Address",
+                                                                 "field":  "primarySmtpAddress"
+                                                             },
+                                                             {
+                                                                 "headerName":  "Name",
+                                                                 "field":  "name"
+                                                             }
+                                                         ],
+                                             "height":  300,
+                                             "rowSelection":  "single"
+                                         },
+                                "dataSourceConfig":  {
+                                                         "dataSourceGuid":  "$dataSourceGuid_0",
+                                                         "input":  {
+                                                                       "propertyInputs":  [
+                                                                                              {
+                                                                                                  "propertyName":  "name",
+                                                                                                  "otherFieldValue":  {
+                                                                                                                          "otherFieldKey":  "name"
+                                                                                                                      }
+                                                                                              }
+                                                                                          ]
+                                                                   }
+                                                     },
+                                "useDefault":  true,
+                                "defaultSelectorProperty":  "name"
+                            },
+        "type":  "grid",
+        "summaryVisibility":  "Show",
+        "requiresTemplateOptions":  true,
+        "requiresKey":  true,
+        "requiresDataSource":  true
+    }
+]
