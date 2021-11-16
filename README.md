@@ -9,6 +9,12 @@ This HelloID Service Automation Delegated Form provides Exchange Online (Office3
  2. Enter the resource capacity
  3. Create the room mailbox
 
+ ## Versioning
+| Version | Description | Date |
+| - | - | - |
+| 1.0.1   | Added version number and updated all-in-one script | 2021/11/16  |
+| 1.0.0   | Initial release | 2021/04/29  |
+
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 - [Requirements](#requirements)
@@ -59,6 +65,9 @@ This delegated form task will create the room mailbox in Exchange.
 > _For more information on how to configure a HelloID PowerShell connector, please refer to our [documentation](https://docs.helloid.com/hc/en-us/articles/360012518799-How-to-add-a-target-system) pages_
 
 > _If you need help, feel free to ask questions on our [forum](https://forum.helloid.com)_
+
+## Getting help
+_If you need help, feel free to ask questions on our [forum](https://forum.helloid.com/forum/helloid-connectors/service-automation/372-helloid-sa-exchange-online-create-room-mailbox)_
 
 ## HelloID Docs
 The official HelloID documentation can be found at: https://docs.helloid.com/
