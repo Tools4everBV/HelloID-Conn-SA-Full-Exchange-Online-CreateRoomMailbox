@@ -1,73 +1,84 @@
-<!-- Requirements -->
-## Requirements
-This HelloID Service Automation Delegated Form uses the [Exchange Online PowerShell V2 module](https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-v2?view=exchange-ps)
+# HelloID-Conn-SA-Full-Exchange-Online-CreateRoomMailbox
 
-<!-- Description -->
+| :information_source: Information                                                                                                                                                                                                                                                                                                                                                          |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| This repository contains the connector and configuration code only. The implementer is responsible for acquiring the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements. |
+
 ## Description
-This HelloID Service Automation Delegated Form provides Exchange Online (Office365) room mailbox functionality. The following steps will be performed:
- 1. Give a name for a new room mailbox to create
- 2. Enter the resource capacity
- 3. Create the room mailbox
+_HelloID-Conn-SA-Full-Exchange-Online-CreateRoomMailbox_ is a template designed for use with HelloID Service Automation (SA) Delegated Forms. It can be imported into HelloID and customized according to your requirements.
 
- ## Versioning
-| Version | Description | Date |
-| - | - | - |
-| 1.0.1   | Added version number and updated all-in-one script | 2021/11/16  |
-| 1.0.0   | Initial release | 2021/04/29  |
+This delegated form creates room mailboxes in Exchange Online. The delegated form supports the following flow:
+1. Enter room mailbox details (display name, mail prefix/domain, alias, resource capacity)
+2. Validate uniqueness for display name, email address, and alias in Microsoft Entra ID
+3. Create the room mailbox in Exchange Online using app-only authentication
 
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
-- [Requirements](#requirements)
-- [Description](#description)
-- [Table of Contents](#table-of-contents)
-- [All-in-one PowerShell setup script](#all-in-one-powershell-setup-script)
-  - [Getting started](#getting-started)
-- [Post-setup configuration](#post-setup-configuration)
-- [Manual resources](#manual-resources)
-  - [Powershell data source 'Exchange-online-Room-mailbox-Create-CheckMailboxName'](#powershell-data-source-exchange-online-room-mailbox-create-checkmailboxname)
-  - [Delegated form task 'Exchange-online-Room-mailbox-Create'](#delegated-form-task-exchange-online-room-mailbox-create)
-- [Getting help](#getting-help)
-- [HelloID Docs](#helloid-docs)
+## Getting started
+### Requirements
 
+- **HelloID On-Premises Service Automation agent**
+  For security reasons, the HelloID cloud agent does not support importing PowerShell modules. This form requires the ExchangeOnlineManagement module to be imported, therefore an on-premises agent is required.
+- **ExchangeOnlineManagement PowerShell module**:
+  The delegated form task and mailbox lookup data source use Exchange Online cmdlets.
+- **Microsoft Entra application registration (certificate-based)**:
+  The connector authenticates with app-only certificate authentication.
+- **Office 365 Exchange Online application permission**:
+  Configure and grant admin consent for `Exchange.ManageAsApp`.
+- **Microsoft Graph application permissions**:
+  Configure and grant admin consent for:
+  - `User.Read.All`
+  - `Domain.Read.All`
 
-## All-in-one PowerShell setup script
-The PowerShell script "createform.ps1" contains a complete PowerShell script using the HelloID API to create the complete Form including user defined variables, tasks and data sources.
+### Connection settings
 
- _Please note that this script asumes none of the required resources do exists within HelloID. The script does not contain versioning or source control_
+The following user-defined variables are used by the connector.
 
+| Setting                        | Description                                                                | Mandatory |
+|--------------------------------|----------------------------------------------------------------------------|-----------|
+| EntraIdTenantId                | Microsoft Entra tenant ID                                                  | Yes       |
+| EntraIdOrganization            | Exchange Online organization domain (for example: contoso.onmicrosoft.com) | Yes       |
+| EntraIdAppId                   | Application (client) ID of the app registration                            | Yes       |
+| EntraIdCertificateBase64String | Base64 encoded certificate (including private key) used for authentication | Yes       |
+| EntraIdCertificatePassword     | Password for the certificate                                               | Yes       |
 
-### Getting started
-Please follow the documentation steps on [HelloID Docs](https://docs.helloid.com/hc/en-us/articles/360017556559-Service-automation-GitHub-resources) in order to setup and run the All-in one Powershell Script in your own environment.
+## Remarks
 
- 
-## Post-setup configuration
-After the all-in-one PowerShell script has run and created all the required resources. The following items need to be configured according to your own environment
- 1. Update the following [user defined variables](https://docs.helloid.com/hc/en-us/articles/360014169933-How-to-Create-and-Manage-User-Defined-Variables)
+### Uniqueness Validation In Microsoft Entra ID
+- The form validates display name, alias, and email address against Microsoft Graph before creation.
+- Validation checks both `mail` and `proxyAddresses` to prevent duplicate SMTP/proxy values.
 
-| Variable name                     | Description                           | Example value     |
-| --------------------------------- | ------------------------------------- | ----------------- |
-| ExchangeOnlineAdminUsername       | Exchange admin account                | user@domain.com   |
-| ExchangeOnlineAdminPassword       | Exchange admin password               | ********          |
-| ExchangeOnlineRoomMalboxDomain    | Exchange Room Malbox Domain suffix    | domain.com        |
+### Room Mailbox Creation Behavior
+- The task uses `New-Mailbox` with `Room = $true` and sets display name, primary SMTP address, and resource capacity.
+- If an alias is provided, it is included in the create action; otherwise Exchange Online determines the alias.
 
+### Domain Selection
+- Available mail domains are retrieved from Microsoft Entra ID (`/v1.0/domains`) and used in the mail domain dropdown.
 
-## Manual resources
-This Delegated Form uses the following resources in order to run
+## Development resources
 
-### Powershell data source 'Exchange-online-Room-mailbox-Create-CheckMailboxName'
-This Powershell data source checks the available names.
+### API endpoints
 
-### Delegated form task 'Exchange-online-Room-mailbox-Create'
-This delegated form task will create the room mailbox in Exchange.
+The following endpoints are used by the connector.
 
+| Endpoint                                                                 | Description                                                                 |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `https://login.microsoftonline.com/{tenantId}/oauth2/token`             | Retrieve Microsoft Graph access token using certificate-based auth          |
+| `https://graph.microsoft.com/v1.0/users?...`                            | Validate uniqueness of display name, alias, and email address              |
+| `https://graph.microsoft.com/v1.0/domains`                              | Retrieve available mail domains                                             |
+| `Connect-ExchangeOnline`                                                 | Open app-only Exchange Online session                                       |
+| `New-Mailbox -Room`                                                      | Create the room mailbox                                                     |
+| `Disconnect-ExchangeOnline`                                              | Close Exchange Online session                                               |
+
+### API documentation
+
+- https://learn.microsoft.com/graph/api/overview
+- https://learn.microsoft.com/graph/api/user-list
+- https://learn.microsoft.com/graph/api/domain-list
+- https://learn.microsoft.com/powershell/module/exchange/connect-exchangeonline
+- https://learn.microsoft.com/powershell/module/exchange/new-mailbox
 
 ## Getting help
-> _For more information on how to configure a HelloID PowerShell connector, please refer to our [documentation](https://docs.helloid.com/hc/en-us/articles/360012518799-How-to-add-a-target-system) pages_
+> :bulb: **Tip:**
+> _For more information on Delegated Forms, please refer to our [documentation](https://docs.helloid.com/en/service-automation/delegated-forms.html) pages_.
 
-> _If you need help, feel free to ask questions on our [forum](https://forum.helloid.com)_
-
-## Getting help
-_If you need help, feel free to ask questions on our [forum](https://forum.helloid.com/forum/helloid-connectors/service-automation/372-helloid-sa-exchange-online-create-room-mailbox)_
-
-## HelloID Docs
+## HelloID docs
 The official HelloID documentation can be found at: https://docs.helloid.com/
