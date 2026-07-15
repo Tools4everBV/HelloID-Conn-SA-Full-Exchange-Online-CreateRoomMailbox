@@ -92,9 +92,9 @@ try {
 
     $null = Connect-ExchangeOnline @createExchangeSessionSplatParams
 
-    # Create shared mailbox
+    # Create room mailbox
     $action = "CreateResource"
-    $actionMessage = "creating shared mailbox with displayname [$($mailboxDisplayName)] and PrimarySmtpAddress [$($mailboxPrimarySmtpAddress)]"
+    $actionMessage = "creating room mailbox with displayname [$($mailboxDisplayName)] and PrimarySmtpAddress [$($mailboxPrimarySmtpAddress)]"
 
     $CreateMailboxParams = @{
         Room               = $true
@@ -116,16 +116,12 @@ try {
     $Log = @{
         Action            = $action # optional. ENUM (undefined = default) 
         System            = "ExchangeOnline" # optional (free format text) 
-        Message           = "Created shared mailbox with displayname [$($mailboxDisplayName)] and PrimarySmtpAddress [$($mailboxPrimarySmtpAddress)]"  # required (free format text) 
+        Message           = "Created room mailbox with displayname [$($mailboxDisplayName)] and PrimarySmtpAddress [$($mailboxPrimarySmtpAddress)]"  # required (free format text) 
         IsError           = $false # optional. Elastic reporting purposes only. (default = $false. $true = Executed action returned an error) 
         TargetDisplayName = $mailboxDisplayName # optional (free format text) 
         TargetIdentifier  = $mailboxPrimarySmtpAddress # optional (free format text) 
     }
     Write-Information -Tags "Audit" -MessageData $log
-
-    # Update shared mailbox to enable MessageCopyForSendOnBehalfEnabled and MessageCopyForSentAsEnabled (can only be done after mailbox is created)
-    $action = "UpdateResource"
-    $actionMessage = "updating MessageCopyForSendOnBehalfEnabled and MessageCopyForSentAsEnabled to [true] for shared mailbox with PrimarySmtpAddress [$($mailboxPrimarySmtpAddress)]"
 }
 catch {
     $ex = $PSItem
